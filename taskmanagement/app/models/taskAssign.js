@@ -6,17 +6,8 @@ var taskSchema=new Schema({
 	taskEndDate:{type:Date,required:true},
 	description:{type:String},
 	created_on: {type: Date,default:Date.now()},
-	updated_on:{type:Date},
+	updated_on:{type:Date,default:Date.now()},
 	id:{type:String},
 	created_by:[String]
 });
-
-taskSchema.pre('save',function(next){
-	let currentDate=new Date();
-	this.updated_on=currentDate;
-	if(!this.created_on)
-		this.created_on=currentDate
-	next();
-});
-
 mongoose.model('task',taskSchema);
