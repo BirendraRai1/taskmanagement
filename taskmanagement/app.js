@@ -14,10 +14,10 @@ mongoose.Promise = global.Promise;
 
 mongoose.connect("mongodb://localhost/taskManagement");
 mongoose.connection.once('open',function(){
-  console.log("Database Connection Established Successfully.");
+	console.log("Database Connection Established Successfully.");
 });
 mongoose.connection.on('error', function() {
-  console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+	console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
   //process.exit(1);
 });
 require('./app/models/taskAssign.js');
@@ -37,8 +37,8 @@ route.controllerFunction(app);
 
 //error handling middleware
 app.use(function (err, req, res, next) {
-  console.error(err.stack)
-  res.status(err ||500).send('Something broke!')
+	console.error(err.stack)
+	res.status(err ||500).send('Something broke!')
 });
 
 app.listen(3000,()=>console.log("server running on port 3000"));
