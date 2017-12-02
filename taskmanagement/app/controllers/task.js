@@ -4,37 +4,30 @@ var taskRouter=express.Router();
 var taskModel=mongoose.model('task');
 var responseGenerator=require('./../../libs/responseGenerator');
 var util=require('./../../middleWares/utils');
-var startDate=require('./../../middleWares/createdDate');
-var finishDate=require('./../../middleWares/finishedDate')
+/*var startDate=require('./../../middleWares/createdDate');
+var finishDate=require('./../../middleWares/finishedDate')*/
 
 
 module.exports.controllerFunction=function(app){
 	//Api to create a task
 	taskRouter.post('/createTask',util.generateRandomNumber,function(req,res){
-		if ((new Date(req.body.taskEndDate).getTime()) <= (new Date().getTime())){
-			var myResponse=responseGenerator.generate(true,"taskend date should be greater than or equal to start date",400,null);
-			res.send(myResponse);	
-		}
-		else{
-			var newTask=new taskModel({
-				id:"task_"+req.suffix_id,
-				taskName:req.body.taskName,
-				description:req.body.description,
-				taskEndDate:req.body.taskEndDate,
-				created_by:req.body.created_by.split(',')
-			});
+		var newTask=new taskModel({
+			id:"task_"+req.suffix_id,
+			taskName:req.body.taskName,
+			description:req.body.description,
+			taskEndDate:req.body.taskEndDate,
+			created_by:req.body.created_by.split(',')
+		});	
 
-			newTask.save(function(err){
-				if(err){
-					var myResponse=responseGenerator.generate(true,err,500,null);
-					res.send(myResponse);
-				}
-				else{
-					res.send(newTask);
-				}
-			});
-		}
-		
+		newTask.save(function(err){
+			if(err){
+				var myResponse=responseGenerator.generate(true,err,500,null);
+				res.send(myResponse);
+			}
+			else{
+				res.send(newTask);
+			}
+		});
 		
 	});//Api to create a task ends here
 
@@ -55,26 +48,16 @@ module.exports.controllerFunction=function(app){
 
 	//Api to update a particular task
 	taskRouter.put('/:id/updateTask',function(req,res){
-		var update=req.body;		
+		var update=req.body;
 		taskModel.findOneAndUpdate({'id':req.params.id},update,{new:true},function(err,updatedTask){
 			if(err){
 				var myResponse=responseGenerator.generate(true,"some error"+err,500,null);
 				res.send(myResponse);
 			}
 			else{
-				updatedTask.updated_on=Date.now();
-				updatedTask.save(function(err){
-					if(err){
-						var myResponse=responseGenerator.generate(true,"some error"+err,500,null);
-						res.send(myResponse);
-					}
-					else{
-						res.send(updatedTask);
-					}
-				});
-				
+				res.send(updatedTask);
 			}
-		});
+		})
 	});//Api to update  a particular task ends here
 
 
@@ -92,50 +75,49 @@ module.exports.controllerFunction=function(app){
 	});//Api to get all tasks ends here
 
 	
-	//API to List all created after a given date
-	taskRouter.get('/allTask/createdDate',startDate.createdDateFilter,function(req,res){
+	taskRouter.get('/allTask/startDate',util.createdDateFilter,function(req,res){
 		taskModel.find({
 			"created_on":{"$gte":req.nextDateTime}},function(err,result){
 				if(err){
-					var myResponse=responseGenerator.generate(true,err,500,null);
-					res.send(myResponse);
+				var myResponse=responseGenerator.generate(true,err,500,null);
+				res.send(myResponse);
 				}
 				else{
 					res.send(result);
 				}
 			});
 
-	});//API to List all created after a given date ends here
+	});
 
-	//API to List all with end date before a given date
-	taskRouter.get('/allTask/endDate',finishDate.endDateFilter,function(req,res){
+
+	taskRouter.get('/allTask/endDate',util.endDateFilter,function(req,res){
 		taskModel.find({
 			"taskEndDate":{"$lt":req.previousDateTime}},function(err,result){
 				if(err){
-					var myResponse=responseGenerator.generate(true,err,500,null);
-					res.send(myResponse);
+				var myResponse=responseGenerator.generate(true,err,500,null);
+				res.send(myResponse);
 				}
 				else{
 					res.send(result);
 				}
 			});
 
-	});//API to List all with end date before a given date ends here
+	});
 
-	//API List all created by a particular user
+
 	taskRouter.get('/allTask/:name',function(req,res){
 		taskModel.find({"created_by":req.params.name},function(err,result){
 			if(err){
 				var myResponse=responseGenerator.generate(true,err,500,null);
 				res.send(myResponse);
-			}
-			else{
-				res.send(result);
-			}
+				}
+				else{
+					res.send(result);
+				}
 		})
-	});//API List all created by a particular user ends here
+	});
 
-	//API, to search tasks by using full text search (using the title and description fields)
+
 	taskRouter.get('/allTask/:taskName/:description',function(req,res){
 		taskModel.find({'taskName':req.params.taskName,'description':req.params.description},function(err,result){
 			if(err){
@@ -146,7 +128,7 @@ module.exports.controllerFunction=function(app){
 				res.send(result);
 			}
 		});
-	});////API, to search tasks by using full text search (using the title and description fields) ends here
+	});
 
 
 	app.use(taskRouter);
