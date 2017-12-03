@@ -10,25 +10,33 @@ function generateRandomNumber(req,res,next){
 }
 
 function endDateFilter(req,res,next){
-	var endDate=new Date(req.query.endDate);
-	console.log(req.query.createDate);
+	if(req.query.endDate){
+		var endDate=new Date(req.query.endDate);//for running on application take endDate from req.query.endDate 
+	}
+	else{
+		var endDate=new Date(req.body.endDate);//for testing take endDate from req.body.endDate
+	}
 	if (isNaN(endDate)){
 		res.send("Please provide a valid date in valid format");
 	}
-	req.previousDateTime  = endDate.getTime();
+	req.previousDateTime  = endDate;
 	next();
 }
 
 function createdDateFilter(req,res,next){
-	var createdDate=new Date(req.query.createDate);
-	console.log(req.query.createDate);
+	if(req.query.createDate){
+		var createdDate=new Date(req.query.createDate);//for running on application take createDate from req.query.endDate	
+	}
+	else{
+		var createdDate=new Date(req.body.createDate);//for testing take createDate from req.body.endDate
+	}
+	console.log(req.body.createDate);
 	if (isNaN(createdDate)){
 		res.send("Please provide a valid date in valid format");
 	}
-	var nextDate=new Date(req.query.createDate);
-	nextDate.setDate(nextDate.getDate()+1);
-	req.createdDateTime = createdDate.getTime();
-	req.nextDateTime  = nextDate.getTime();
+	var nextDate=createdDate.setDate(createdDate.getDate()+1);
+	req.nextDateTime  = nextDate;
+	console.log(" createdDateFilter nextDate",nextDate);
 	next();
 }
 

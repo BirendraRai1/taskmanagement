@@ -43,7 +43,7 @@ describe('task', () => {
       let task= {
         taskName:"checkbox question",
         description:"hindi",
-        taskEndDate:today.setDate(today.getDate() - 1),
+        taskEndDate:new Date(27-12-21),
         created_by:"satyendra"
       }
       chai.request(server)
@@ -105,7 +105,7 @@ describe('task', () => {
     it('it should GET all task by the given user', (done) => {
       let task = new taskManagement({
         taskName:"social studies",
-        taskEndDate:today.setDate(today.getDate() +8),
+        taskEndDate:new Date(27-12-13),
         description:"objective questions",
         created_by:"neha"
       });
@@ -128,12 +128,74 @@ describe('task', () => {
   });
 
 
+
+
+
+  //Test the /GET route to get all task with end date before a given date
+  describe('/GET /allTask with with end date before a given date', () => {
+    it('it should GET all task with end date before a given date', (done) => {
+      let task = new taskManagement({
+        taskName:"music",
+        description:"pleasing for the mind",
+        created_by:"neha",
+        taskEndDate:new Date(27-12-11)
+      });
+      task.save((err, task) => {
+        console.log("task",task);
+        chai.request(server)
+        .get('/allTask/endDate')
+        .send({ 'endDate': today.setDate(today.getDate() + 22) })
+        .end((err, res) => {
+         console.log("GET all task with end date before a given date",res.body);
+         res.body.should.have.status(200);
+         res.body.should.be.a('object');
+         res.body.data[0].should.have.property('description');
+         res.body.data[0].should.have.property('taskEndDate');
+         res.body.should.have.property('message').eql('successfully fetched all task with end date before a given date');
+         res.body.data[0].should.have.property('created_by').eql(task.created_by);;
+         done();
+       });
+      });
+
+    });
+  });
+
+  //Test the /GET route to get all task with create date after a given date
+  describe('/GET /allTask with  created date after a given date', () => {
+    it('it should GET all task with created date after a given date', (done) => {
+      let task = new taskManagement({
+        taskName:"drawing",
+        description:"inhance creativity",
+        created_by:"neha",
+        taskEndDate:new Date(27-12-25)
+      });
+      task.save((err, task) => {
+        console.log("task in get task after ",task);
+        chai.request(server)
+        .get('/allTask/startDate')
+        .send({ 'createDate': new Date(27-11-05) })
+        .end((err, res) => {
+         console.log("GET all task with start date after a given date",res.body);
+         res.body.should.have.status(200);
+         res.body.should.be.a('object');
+         res.body.data[0].should.have.property('description');
+         res.body.data[0].should.have.property('taskEndDate');
+         res.body.should.have.property('message').eql('successfully fetched all task with created date after a given date');
+         res.body.data[0].should.have.property('created_by').eql(task.created_by);
+         done();
+       });
+      });
+
+    });
+  });
+
+
   //Test the /PUT route to update a task with particular id
   describe('/PUT/:id/updateTask', () => {
     it('it should UPDATE a task given the id', (done) => {
       let task = new taskManagement({
        taskName:"yoga",
-       taskEndDate:today.setDate(today.getDate() + 2),
+       taskEndDate:new Date(27-12-21),
        description:"fit for health",
        created_by:"mahesh"
 
@@ -141,8 +203,8 @@ describe('task', () => {
       task.save((err, task) => {
         //console.log("update task",task)
         chai.request(server)
-        .put('/'+task.id+'/'+'updateTask')
-        .send({taskName:"yoga",taskEndDate:today.setDate(today.getDate() + 7),description:"fit for health",created_by:"mahesh"})
+        .put('/'+task._id+'/'+'updateTask')
+        .send({taskName:"yoga",taskEndDate:new Date(27-12-21),description:"fit for health",created_by:"mahesh"})
         .end((err, res) => {
           console.log("update given taskid",res.body);
           res.body.should.have.status(200);
@@ -159,7 +221,7 @@ describe('/DELETE/:id deleteTask', () => {
   it('it should DELETE a task given the id', (done) => {
     let task = new taskManagement({
       taskName:"music",
-      taskEndDate:today.setDate(today.getDate() + 2),
+      taskEndDate:new Date(27-12-12),
       created_by:"bandhna",
       description:"sounds interesting"
     })

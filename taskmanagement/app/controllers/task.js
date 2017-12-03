@@ -93,7 +93,7 @@ module.exports.controllerFunction=function(app){
 		});
 	});//Api to get all tasks ends here
 
-	
+	//API to List all task created after a given date
 	taskRouter.get('/allTask/startDate',util.createdDateFilter,function(req,res){
 		taskModel.find({
 			"created_on":{"$gte":req.nextDateTime}},function(err,result){
@@ -102,28 +102,31 @@ module.exports.controllerFunction=function(app){
 					res.send(myResponse);
 				}
 				else{
-					res.send(result);
+					var myResponse=responseGenerator.generate(false,"successfully fetched all task with created date after a given date",200,result);
+					res.send(myResponse);
 				}
 			});
 
-	});
+	});//API to List all task created after a given date ends here
 
-
+	//API to List all with task with end date before a given date
 	taskRouter.get('/allTask/endDate',util.endDateFilter,function(req,res){
-		taskModel.find({
+			taskModel.find({
 			"taskEndDate":{"$lt":req.previousDateTime}},function(err,result){
+				console.log("allTask endDate",result);
 				if(err){
 					var myResponse=responseGenerator.generate(true,err,500,null);
 					res.send(myResponse);
 				}
 				else{
-					res.send(result);
+					var myResponse=responseGenerator.generate(false,"successfully fetched all task with end date before a given date",200,result);
+					res.send(myResponse);
 				}
 			});
 
-	});
+	});//API to List all with task with end date before a given date ends here
 
-
+	//API to List all task created by a particular user
 	taskRouter.get('/allTask/:name',function(req,res){
 		taskModel.find({"created_by":req.params.name},function(err,result){
 			if(err){
@@ -135,7 +138,7 @@ module.exports.controllerFunction=function(app){
 				res.send(myResponse);
 			}
 		})
-	});
+	});//API to List all task created by a particular user ends here
 
 
 	taskRouter.get('/allTask/:taskName/:description',function(req,res){
